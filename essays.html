@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Essay Title] - Akshay Nuthanapati</title>
+    <title>Essays - Akshay</title>
     <style>
         body {
             font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
@@ -30,28 +30,40 @@
         
         h1 {
             font-size: 2em;
-            margin-bottom: 0.2em;
+            margin-bottom: 0.5em;
             font-weight: normal;
+        }
+        
+        .essays-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .essays-list li {
+            margin-bottom: 1.5em;
+        }
+        
+        .essays-list a {
+            color: #222;
+            text-decoration: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.1em;
+        }
+        
+        .essays-list a:hover {
+            border-bottom-color: #222;
         }
         
         .date {
             color: #666;
-            margin-bottom: 2em;
-            display: block;
+            font-size: 0.9em;
+            margin-left: 0.5em;
         }
         
-        article {
-            font-size: 1.1em;
-        }
-        
-        article p {
-            margin-bottom: 1.5em;
-        }
-        
-        article h2 {
-            font-size: 1.4em;
-            margin: 1.5em 0 0.5em;
-            font-weight: normal;
+        .description {
+            color: #444;
+            margin-top: 0.5em;
+            font-size: 0.95em;
         }
         
         @media (max-width: 600px) {
@@ -66,15 +78,28 @@
         <a href="/">← Home</a>
     </nav>
 
-    <article>
-        <h1>Invariant Point Attention</h1>
-        <h1>Notes on Variational Inference</h1>
-        <span class="date">[Publication Date]</span>
-        
-        <!-- Essay content goes here -->
-        <p>
-            Your essay content will go here. The styling matches the minimalist, typography-focused design of the main site.
-        </p>
-    </article>
+    <header>
+        <h1>Essays</h1>
+    </header>
+
+    <main>
+        <ul class="essays-list">
+            <li>
+                <a href="/essays/invariant-point-attention.html">Invariant Point Attention</a>
+                <span class="date">December 2024</span>
+                <p class="description">An exploration of invariant point attention mechanisms in geometric deep learning and their applications to 3D molecular structures.</p>
+            </li>
+            <li>
+                <a href="/essays/variational-inference-notes.html">Notes on Variational Inference</a>
+                <span class="date">November 2024</span>
+                <p class="description">A comprehensive overview of variational inference techniques, from the basics to modern applications in deep learning.</p>
+            </li>
+            <li>
+                <a href="/essays/deep-learning-theory.html">The Science of Deep Learning</a>
+                <span class="date">October 2024</span>
+                <p class="description">Understanding the theoretical foundations of deep learning and why neural networks work so well.</p>
+            </li>
+        </ul>
+    </main>
 </body>
 </html>
