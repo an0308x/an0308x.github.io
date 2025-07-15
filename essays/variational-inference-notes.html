@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes on Variational Inference - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            font-weight: normal;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+            font-weight: normal;
+        }
+        h3 {
+            font-size: 1.2em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: normal;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .date {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 2em;
+        }
+        .abstract {
+            font-style: italic;
+            color: #444;
+            margin-bottom: 2em;
+            padding-left: 1em;
+            border-left: 3px solid #ddd;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        blockquote {
+            margin: 1.5em 0;
+            padding-left: 1em;
+            border-left: 3px solid #ddd;
+            color: #444;
+        }
+        ul, ol {
+            margin-bottom: 1em;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/essays.html">← Essays</a>
+    </nav>
+
+    <header>
+        <h1>Notes on Variational Inference</h1>
+        <div class="date">November 2024</div>
+    </header>
+
+    <main>
+        <div class="abstract">
+            A comprehensive overview of variational inference techniques, from the basics to modern applications in deep learning.
+        </div>
+
+        <h2>Introduction</h2>
+        <p>
+            Variational inference (VI) is a powerful framework for approximating complex probability distributions in Bayesian machine learning. It provides scalable alternatives to traditional sampling-based methods, enabling efficient inference in high-dimensional models. This essay covers the fundamentals of VI, its mathematical formulation, and its applications, with a special focus on Auto-Encoding Variational Bayes (AEVB).
+        </p>
+
+        <h2>Theory Behind Auto-Encoding Variational Bayes (AEVB)</h2>
+        <p>
+            Auto-Encoding Variational Bayes (AEVB) is the theoretical foundation behind Variational Autoencoders (VAEs), a class of deep generative models. The core idea is to use variational inference to approximate the intractable posterior distribution of latent variables in probabilistic models with neural networks.
+        </p>
+        <h3>Latent Variable Models</h3>
+        <p>
+            Consider a generative model with observed data \( x \) and latent variables \( z \), defined by the joint distribution \( p_\theta(x, z) = p_\theta(x|z)p(z) \). The goal is to infer the posterior \( p_\theta(z|x) \), which is often intractable.
+        </p>
+        <h3>Variational Inference Objective</h3>
+        <p>
+            Variational inference introduces a family of tractable distributions \( q_\phi(z|x) \) to approximate the true posterior. The quality of the approximation is measured by the Kullback-Leibler (KL) divergence:
+        </p>
+        <pre><code>\mathrm{KL}(q_\phi(z|x) \|\| p_\theta(z|x))</code></pre>
+        <p>
+            Since the true posterior is intractable, we maximize the Evidence Lower Bound (ELBO) instead:
+        </p>
+        <pre><code>\log p_\theta(x) \geq \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - \mathrm{KL}(q_\phi(z|x) \|\| p(z))</code></pre>
+        <p>
+            The first term encourages the model to reconstruct the data well, while the second term regularizes the approximate posterior to be close to the prior.
+        </p>
+        <h3>Reparameterization Trick</h3>
+        <p>
+            To enable gradient-based optimization, AEVB introduces the reparameterization trick. For example, if \( q_\phi(z|x) = \mathcal{N}(z; \mu_\phi(x), \sigma^2_\phi(x)) \), we can sample \( z \) as:
+        </p>
+        <pre><code>z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)</code></pre>
+        <p>
+            This allows gradients to flow through \( \mu_\phi(x) \) and \( \sigma_\phi(x) \) during backpropagation.
+        </p>
+        <h3>Summary</h3>
+        <p>
+            AEVB provides a scalable and efficient way to train deep generative models by combining variational inference with neural networks and the reparameterization trick. This framework underlies the Variational Autoencoder (VAE) and its many extensions.
+        </p>
+
+        <h2>Other Topics in Variational Inference</h2>
+        <h3>Mean-Field Variational Inference</h3>
+        <p>
+            [Placeholder for discussion on mean-field VI]
+        </p>
+        <h3>Stochastic Variational Inference</h3>
+        <p>
+            [Placeholder for discussion on stochastic VI]
+        </p>
+        <h3>Applications in Deep Learning</h3>
+        <p>
+            [Placeholder for applications of VI in deep learning]
+        </p>
+        <h3>Recent Advances</h3>
+        <p>
+            [Placeholder for recent research and developments in VI]
+        </p>
+
+        <h2>References</h2>
+        <p>
+            [Your references and citations, e.g., Kingma & Welling (2014), Rezende et al. (2014), and other foundational papers.]
+        </p>
+    </main>
+</body>
+</html> 
