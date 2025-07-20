@@ -116,6 +116,178 @@
             AlphaFold represents one of the most significant breakthroughs in computational biology, solving the decades-old protein folding problem with unprecedented accuracy. This essay explores the key components that make AlphaFold successful: its innovative use of invariant point attention mechanisms and its deep understanding of protein fitness landscapes.
         </p>
 
+        <h2>The Central Dogma of Biology and Protein Structure</h2>
+        <p>
+            Essentially, the central dogma of biology explains the flow of genetic information in a biological system and its forward path consists of three steps:
+        </p>
+        <ol>
+            <li><strong>DNA Replication:</strong> The DNA is replicated (inside the nucleus). A DNA cell makes an identical copy of its genome before it divides itself into two separate chains.</li>
+            <li><strong>Transcription:</strong> The DNA chain is used as a template to produce a complementary RNA copy in a process called transcription. This will again happen inside the nucleus.</li>
+            <li><strong>Translation:</strong> The RNA chain is decoded and translated by ribosomes to produce a polypeptide sequence, otherwise known as a protein. This process is called translation and is happening outside of the nucleus.</li>
+        </ol>
+        <div class="figure">
+            <em>[central-dogma-of-biology]<br/>
+            An illustration showing the flow of information between DNA, RNA and protein. Image credit: Genome Research Limited</em>
+        </div>
+        <p>
+            The 4 fundamental DNA elements, called bases, are {A, T, C, G} and they will be our sequence elements later on! RNA consists of 4 bases as well but T is replaced with U: {A, U, C, G}. Every DNA or RNA sequence is formulated as a combination of these 4 bases.
+        </p>
+        <p>
+            <em>The following animation can illustrate the process in great detail:</em>
+        </p>
+        <blockquote>Animation placeholder: Central Dogma Animation</blockquote>
+        <h3>Proteins, Amino Acids, Nucleotides and Codons</h3>
+        <p>
+            By now you get the idea that cells generate proteins, which are sequences of amino acids. A polypeptide is a polymer of amino acids joined together by peptide bonds. In other words, amino acids are the structural elements of all proteins. There are many known amino acids but only 20 are encoded by the universal genetic code. Genetic code refers to all the valid combinations of nucleotide bases. Specifically, 3 adjacent nucleotides constitute a unit known as the codon, which codes for an amino acid.
+        </p>
+        <p>
+            For example, the sequence AUG (in the mRNA) is a codon that specifies the amino acid methionine, which almost always specifies the beginning of a protein. There are 64 possible codons. Out of them, there are 3 codons that do not code for amino acids but indicate the end of a protein. The remaining 61 codons specify the 20 amino acids that make up proteins. Below is the table that demonstrates the valid combinations.
+        </p>
+        <div class="figure">
+            <em>[genetic-code-image]<br/>
+            Source: Biology Pictures Blog</em>
+        </div>
+        <p><em>The following video clarifies many aspects on proteins:</em></p>
+        <blockquote>Video placeholder: Protein Structure and Function</blockquote>
+        <p>We find it very important to highlight the different visualization of the proteins, as described in the video:</p>
+        <div class="figure">
+            <em>[protein-3d-visualization]<br/>
+            Source</em>
+        </div>
+        <p>If you are curious to know all the amino acids names and symbols, consult this table.</p>
+        <h3>The 4 Levels of Protein Structures</h3>
+        <p>To describe a protein’s structure, we use 4 distinct levels. The following figure sums up the protein structural levels from a biological standpoint:</p>
+        <div class="figure">
+            <em>[protein-structures]<br/>
+            Source: Figure after © 2010 PJ Russell, iGenetics 3rd ed.; all text material © 2014 by Steven M. Carr</em>
+        </div>
+        <ol>
+            <li><strong>Primary structure:</strong> Simply the sequence of amino acids in a polypeptide chain.<br/>
+                <div class="figure">
+                    <em>[primary-structure]<br/>
+                    The hormone cow insulin has two polypeptide chains, A and B, shown in diagram below. Each chain has its own set of amino acids, assembled in a particular order. Source and Image credit: OpenStax Biology.</em>
+                </div>
+            </li>
+            <li><strong>Secondary structure:</strong> The 3D arrangement of stable local repeating structures. The two main types are the α-helix and the β-structures (beta sheets).<br/>
+                <div class="figure">
+                    <em>[alpha-helix-vs-beta-sheets]<br/>
+                    Alpha helices vs beta sheets. Source: bioninja.com</em>
+                </div>
+            </li>
+            <li><strong>Tertiary structure:</strong> The overall 3-D shape of the protein molecule, describing the spatial relationship of the secondary structures to one another.</li>
+            <li><strong>Quaternary structure:</strong> Describes protein-protein interactions in closely packed arrangements. Not all proteins have a quaternary structure.<br/>
+                <div class="figure">
+                    <em>[tertiary-structure-proteins]<br/>
+                    An example of a protein with a quaternary structure is haemoglobin (O2 carrying molecule in red blood cells)Source: bioninja.com</em>
+                </div>
+            </li>
+        </ol>
+        <h3>A Closer Look at Protein Folding: Domains, Motifs, Residues and Turns</h3>
+        <ul>
+            <li><strong>Domains:</strong> A (structural) domain is a self-stabilizing part of the protein's polypeptide chain. It often folds independently of the rest of the protein chain and is responsible for a specific self-contained job in the protein.<br/>
+                <div class="figure">
+                    <em>[protein-domains]<br/>
+                    The structures of two different proteins shown below share a common PH (Pleckstrin Homology) domain (maroon). Source: LibreTexts:Protein Domains, Motifs, and Folds in Protein Structure</em>
+                </div>
+            </li>
+            <li><strong>Structural motifs:</strong> Small structure-dependent 3D regions formed from connecting different secondary structural elements (e.g. α-helices and β-sheets). Motifs do not retain their function when separated from the larger protein.<br/>
+                <div class="figure">
+                    <em>[example-of-motifs]<br/>
+                    Commonly observed motifs Source:Principles of Biochemistry</em>
+                </div>
+                <div class="figure">
+                    <em>[primary-structure-motifs]<br/>
+                    Source: Berg JM, Tymoczko JL, Stryer L. Biochemistry. 5th edition.</em>
+                </div>
+            </li>
+            <li><strong>Residues and side chains:</strong> A residue is a single molecular unit within a polypeptide (an amino acid). The defining feature of an amino acid is its side chain, which influences its properties and interactions.<br/>
+                <div class="figure">
+                    <em>[residues-and-side-chains]<br/>
+                    The defining feature of an amino acid is its side chain (at top, blue circle; below, all colored circles). Source:Nature Education, 2010.</em>
+                </div>
+            </li>
+            <li><strong>Turns and loops:</strong> Types of secondary protein structures that connect α-helices and β-strands, usually causing a change in direction of the polypeptide chain.<br/>
+                <div class="figure">
+                    <em>[example-of-turns-aminoacids]<br/>
+                    Example of motifs. Left: A β-hairpin motif. Right: Helix-Turn-Helix (HTH) motif.</em>
+                </div>
+            </li>
+        </ul>
+        <h3>What is a Distogram?</h3>
+        <p>
+            The distogram is the key intermediate step to protein folding. For a sequence of length L, a 3D distogram (distance + histogram) is an LxL matrix, which shows the histogram of the pairwise distances. The distances are “binned” so it is regarded as a binned distance distribution. Distograms are also called contact maps and they are always symmetric matrices.
+        </p>
+        <div class="figure">
+            <em>[distogram]<br/>
+            Source:Deep Learning-Based Advances in Protein Structure Prediction, Pakhrin et al 2021</em>
+        </div>
+        <blockquote>
+            “The problem of protein distogram or real-valued distance prediction (bottom row) is similar to the depth prediction problem in computer vision (top row). In all these problems, the input to the Deep Learning model is a volume (3D tensor). In computer vision, 2D images expand as a volume because of the RGB channels. Similarly, in the case of distance prediction, predicted 1D and 2D features are transformed and packed into 3D volume with many channels of inter-residue information” ~ Subash C. Pakhrin et al. 2021
+        </blockquote>
+        <p>
+            But why distograms? Well, the distances in a distogram are relative, meaning that the inter-residue distances are invariant to 3D rotations and translations. This makes the task much simpler.
+        </p>
+        <h3>Genotype vs Phenotype</h3>
+        <p>
+            In a nutshell, an organism’s genotype is the set of genes that it carries while the phenotype is all of its observable characteristics; which are influenced both by its genotype and by the environment.
+        </p>
+        <blockquote>
+            In a supervised machine learning setup, the phenotype is often the target variable.
+        </blockquote>
+        <h3>Biological Tasks That Can Be Approached with Machine Learning</h3>
+        <ul>
+            <li><strong>MSA (Multiple Sequence Alignment):</strong> MSA refers to the process or the result of sequence alignment of three or more biological sequences, generally a protein, DNA, or RNA. AlphaFold heavily relies on MSA as an additional input. Instead of the particular primary structure of the protein (target), it finds multiple similar proteins and aligns them together. This process can be regarded as additional information for the model that will work like hand-crafted features.<br/>
+                <div class="figure">
+                    <em>[aligned-sequences]<br/>
+                    Source:Wikipedia</em>
+                </div>
+                <p>
+                    MSA provides a hint towards the fact that the 3D structure is more conserved than the primary sequence structure. The sequence can be slightly altered but the overall structure that is related to protein function is preserved!
+                </p>
+            </li>
+            <li><strong>Protein 3D Structure Prediction:</strong> The inference of the 3D structure of a protein from its amino acid sequence (input). In biological terms, the 3D structure is the secondary and tertiary structure (output).<br/>
+                <div class="figure">
+                    <em>[protein-contact-prediction]<br/>
+                    Two globular proteins with some contacts in them shown in black dotted lines along with the contact distance in Armstrong. The alpha helical protein 1bkr (left) has many long-range contacts and the beta sheet protein 1c9o (right) has more short- and medium-range contacts. Source: Protein Residue Contacts and Prediction Methods</em>
+                </div>
+            </li>
+            <li><strong>Genotype to Phenotype Prediction:</strong> Predicting phenotypes from genotypes, e.g., toehold switch performance from RNA sequences.<br/>
+                <div class="figure">
+                    <em>[riboregulators]<br/>
+                    Source: Sequence-to-function deep learning frameworks for engineered riboregulators, Valeri et al (2020)</em>
+                </div>
+            </li>
+        </ul>
+        <h3>Representing DNA and Amino Acid Sequences</h3>
+        <p>
+            In the DNA world, we have a character-level encoding. Each DNA sequence is a word and each token is a character from the set {A, T, G, C} for DNA and {A, U, G, C} for RNA. In amino acids, we have 20 elements in our dictionary, as there are only 20 amino acids that can be produced from the human genome.
+        </p>
+        <p>
+            A different approach is to use n-gram-like representations (k-mers). For example, for the DNA sequence TAGACTGTC, we get five possible overlapping 5-mers: {TAGAC, AGACT, GACTG, ACTGT, CTGTC}. This creates a different form of embedding, where our vectors contain the number each k-mer occurs for a given sequence.
+        </p>
+        <h3>Association of Biology with ML Model Design</h3>
+        <ul>
+            <li><strong>Attention Mechanism for Processing MSA:</strong> The MSA Transformer modifies the attention mechanism to process a set of MSA sequences using tied row attention and axial attention.<br/>
+                <div class="figure">
+                    <em>[attention-msa]<br/>
+                    Source:MSA Transformer, Roshan Rao et al.</em>
+                </div>
+                <div class="figure">
+                    <em>[axial-attention]<br/>
+                    Source: Axial-DeepLab: Stand-Alone Axial-Attention for Panoptic Segmentation</em>
+                </div>
+            </li>
+            <li><strong>AlphaFold2 Core Self-Attention Module: Invariant Point Attention:</strong> The core engineering on AlphaFold2 was the design of a transformer architecture that respects the particularities of the 3D domain and proteins. The DeepMind team proposed the Invariant Point Attention (IPA) module, which is invariant under global Euclidean transformations (roto-translations).<br/>
+                <div class="figure">
+                    <em>[Invariant-point-attention]<br/>
+                    Invariant point attention. Top blue arrays: Invariant Point Attention Module. Middle, red arrays: modulation by the pair representation. Bottom, green arrays: standard attention on abstract features. Dimensions: r: residues, c: channels, h: heads, p: points. Source: AlphaFold2 supplementary material</em>
+                </div>
+            </li>
+        </ul>
+        <p>
+            Be sure to check our detailed article on vanilla self-attention to grasp a high-level overview of the core AlphaFold2 module. For more information on equivariance we suggest Fabian Fuchs & Justas Dauparas blogpost.
+        </p>
+
         <h2>Invariant Point Attention</h2>
         
         <p>
