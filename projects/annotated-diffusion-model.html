@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotated Diffusion Model - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #444;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 1em 0;
+        }
+        .figure {
+            text-align: center;
+            margin: 2em 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .figure-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+            pre {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Home</a> |
+        <a href="/projects.html">← Projects</a>
+    </nav>
+    <header>
+        <h1>Annotated Diffusion Model</h1>
+        <p><em>A comprehensive, annotated implementation of diffusion models for generative modeling</em></p>
+    </header>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                This project provides a fully annotated implementation of diffusion models, a class of generative models that have recently achieved state-of-the-art results in image, audio, and data synthesis. The goal is to demystify the mathematical foundations and practical implementation of diffusion-based generative models, making them accessible to both researchers and practitioners.
+            </p>
+            <div class="highlight">
+                <strong>Key Features:</strong>
+                <ul>
+                    <li>Step-by-step annotated code for the entire diffusion process</li>
+                    <li>Clear explanations of the forward (diffusion) and reverse (denoising) processes</li>
+                    <li>Implementation of training and sampling loops</li>
+                    <li>Visualization tools for understanding the diffusion process</li>
+                    <li>References to foundational papers and further reading</li>
+                </ul>
+            </div>
+        </section>
+        <section>
+            <h2>Background: What are Diffusion Models?</h2>
+            <p>
+                Diffusion models are a class of generative models that learn to generate data by simulating a gradual noising process (forward process) and then learning to reverse this process (reverse process) to recover the original data. They have been used to generate high-quality images, audio, and more.
+            </p>
+            <ul>
+                <li><strong>Forward process:</strong> Gradually adds noise to data until it becomes pure noise.</li>
+                <li><strong>Reverse process:</strong> Learns to denoise step-by-step, reconstructing data from noise.</li>
+            </ul>
+            <div class="figure">
+                <em>[Diffusion process illustration placeholder]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Mathematical Foundations</h2>
+            <p>
+                The forward process is defined as a Markov chain that gradually adds Gaussian noise to the data:
+            </p>
+            <pre><code>x_0 \sim q(x_0) 
+x_t = \sqrt{\alpha_t} x_{t-1} + \sqrt{1-\alpha_t} \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+</code></pre>
+            <p>
+                The reverse process is parameterized by a neural network that predicts either the noise or the original data at each step:
+            </p>
+            <pre><code>p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t))
+</code></pre>
+            <p>
+                The model is trained to minimize a variational bound on the negative log-likelihood, often simplified to a mean squared error loss between the predicted and true noise.
+            </p>
+        </section>
+        <section>
+            <h2>Annotated PyTorch Implementation</h2>
+            <p>Below is a minimal, annotated PyTorch implementation of the core diffusion process:</p>
+            <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# Forward process: add noise
+class DiffusionForward:
+    def __init__(self, alphas):
+        self.alphas = alphas
+        self.sqrt_alphas = torch.sqrt(alphas)
+        self.sqrt_one_minus_alphas = torch.sqrt(1 - alphas)
+    def q_sample(self, x_0, t, noise=None):
+        if noise is None:
+            noise = torch.randn_like(x_0)
+        return self.sqrt_alphas[t] * x_0 + self.sqrt_one_minus_alphas[t] * noise
+
+# Simple denoising model (MLP for illustration)
+class DenoiseModel(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, dim)
+        )
+    def forward(self, x, t):
+        return self.net(x)
+
+# Training loop (simplified)
+def train(model, diffusion, data_loader, optimizer, num_steps):
+    model.train()
+    for x_0 in data_loader:
+        t = torch.randint(0, num_steps, (x_0.size(0),))
+        noise = torch.randn_like(x_0)
+        x_t = diffusion.q_sample(x_0, t, noise)
+        pred_noise = model(x_t, t)
+        loss = F.mse_loss(pred_noise, noise)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+</code></pre>
+            <p>
+                This code demonstrates the core logic of the diffusion process and training. In practice, more advanced architectures (e.g., U-Net) and techniques are used for high-dimensional data like images.
+            </p>
+        </section>
+        <section>
+            <h2>Visualization</h2>
+            <p>
+                Visualizing the diffusion and denoising process is crucial for understanding model behavior. Typical visualizations include:
+            </p>
+            <ul>
+                <li>Step-by-step noising and denoising of sample data</li>
+                <li>Plots of loss curves during training</li>
+                <li>Generated samples at various stages</li>
+            </ul>
+            <div class="figure">
+                <em>[Visualization placeholder: Diffusion steps and generated samples]</em>
+            </div>
+        </section>
+        <section>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li>Ho, J., Jain, A., & Abbeel, P. (2020). <a href="https://arxiv.org/abs/2006.11239" target="_blank">Denoising Diffusion Probabilistic Models</a></li>
+                <li>Sohl-Dickstein, J., Weiss, E., Maheswaranathan, N., & Ganguli, S. (2015). <a href="https://arxiv.org/abs/1503.03585" target="_blank">Deep Unsupervised Learning using Nonequilibrium Thermodynamics</a></li>
+                <li>Song, Y., & Ermon, S. (2019). <a href="https://arxiv.org/abs/1907.05600" target="_blank">Generative Modeling by Estimating Gradients of the Data Distribution</a></li>
+                <li>Dhariwal, P., & Nichol, A. (2021). <a href="https://arxiv.org/abs/2105.05233" target="_blank">Diffusion Models Beat GANs on Image Synthesis</a></li>
+                <li><a href="https://github.com/an0308x/annotated-diffusion-model" target="_blank">Project GitHub Repository</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html> 
