@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNA Velocity Analysis - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #444;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 1em 0;
+        }
+        .figure {
+            text-align: center;
+            margin: 2em 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .figure-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+            pre {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Home</a> |
+        <a href="/projects.html">← Projects</a>
+    </nav>
+    <header>
+        <h1>RNA Velocity Analysis</h1>
+        <p><em>Implementation and analysis of RNA velocity methods for inferring cellular dynamics from single-cell RNA sequencing data</em></p>
+    </header>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                This project implements and analyzes RNA velocity methods, a powerful approach for understanding cellular dynamics from single-cell RNA sequencing (scRNA-seq) data. RNA velocity provides insights into the direction and speed of cellular state transitions by analyzing the balance between unspliced and spliced RNA molecules.
+            </p>
+            <div class="highlight">
+                <strong>Key Features:</strong>
+                <ul>
+                    <li>RNA velocity estimation and visualization</li>
+                    <li>Trajectory inference and cellular dynamics analysis</li>
+                    <li>Integration with scRNA-seq analysis pipelines</li>
+                    <li>Custom velocity models and extensions</li>
+                    <li>Comprehensive evaluation and benchmarking</li>
+                </ul>
+            </div>
+        </section>
+        <section>
+            <h2>Understanding RNA Velocity</h2>
+            <p>
+                RNA velocity is based on the principle that the ratio of unspliced to spliced RNA provides information about the future state of a cell. Key concepts include:
+            </p>
+            <ul>
+                <li><strong>Unspliced RNA:</strong> Pre-mRNA that has not been processed</li>
+                <li><strong>Spliced RNA:</strong> Mature mRNA ready for translation</li>
+                <li><strong>Velocity Vector:</strong> Direction and magnitude of cellular state change</li>
+                <li><strong>Trajectory:</strong> Predicted path of cellular differentiation</li>
+            </ul>
+            <div class="figure">
+                <em>[RNA velocity schematic showing unspliced/spliced RNA dynamics]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Mathematical Framework</h2>
+            <p>
+                RNA velocity is based on a simple kinetic model of RNA processing:
+            </p>
+            <pre><code># RNA processing kinetics
+dU/dt = α - βU  # Unspliced RNA dynamics
+dS/dt = βU - γS  # Spliced RNA dynamics
+
+# Velocity calculation
+velocity = βU - γS</code></pre>
+            <p>
+                Where:
+            </p>
+            <ul>
+                <li><strong>α:</strong> Transcription rate</li>
+                <li><strong>β:</strong> Splicing rate</li>
+                <li><strong>γ:</strong> Degradation rate</li>
+                <li><strong>U:</strong> Unspliced RNA abundance</li>
+                <li><strong>S:</strong> Spliced RNA abundance</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Implementation</h2>
+            <h3>Data Preprocessing</h3>
+            <p>
+                Processing scRNA-seq data for velocity analysis:
+            </p>
+            <pre><code>import scanpy as sc
+import scvelo as scv
+
+def preprocess_velocity_data(adata):
+    """Preprocess single-cell data for velocity analysis"""
+    # Filter genes and cells
+    sc.pp.filter_genes(adata, min_cells=10)
+    sc.pp.filter_cells(adata, min_genes=200)
+    
+    # Normalize data
+    sc.pp.normalize_total(adata)
+    sc.pp.log1p(adata)
+    
+    # Find highly variable genes
+    sc.pp.highly_variable_genes(adata)
+    
+    # Compute PCA
+    sc.pp.pca(adata)
+    
+    # Compute neighborhood graph
+    sc.pp.neighbors(adata)
+    
+    return adata</code></pre>
+            <h3>Velocity Estimation</h3>
+            <p>
+                Computing RNA velocity using scVelo:
+            </p>
+            <pre><code>def compute_velocity(adata):
+    """Compute RNA velocity"""
+    # Compute moments
+    scv.pp.moments(adata)
+    
+    # Recover dynamics
+    scv.tl.recover_dynamics(adata)
+    
+    # Compute velocity
+    scv.tl.velocity(adata, mode='dynamical')
+    
+    # Compute velocity graph
+    scv.tl.velocity_graph(adata)
+    
+    return adata
+
+def visualize_velocity(adata, basis='umap'):
+    """Visualize velocity results"""
+    # Compute embedding
+    sc.tl.umap(adata)
+    
+    # Plot velocity stream
+    scv.pl.velocity_embedding_stream(adata, basis=basis)
+    
+    # Plot velocity arrows
+    scv.pl.velocity_embedding(adata, basis=basis, arrow_length=3)</code></pre>
+        </section>
+        <section>
+            <h2>Trajectory Inference</h2>
+            <p>
+                Inferring cellular trajectories from velocity data:
+            </p>
+            <pre><code>def infer_trajectories(adata):
+    """Infer cellular trajectories"""
+    # Compute pseudotime
+    scv.tl.velocity_pseudotime(adata)
+    
+    # Find terminal states
+    scv.tl.terminal_states(adata)
+    
+    # Compute velocity confidence
+    scv.tl.velocity_confidence(adata)
+    
+    return adata
+
+def analyze_dynamics(adata):
+    """Analyze cellular dynamics"""
+    # Plot velocity vs expression
+    scv.pl.velocity(adata, ['gene1', 'gene2'], ncols=2)
+    
+    # Plot phase portraits
+    scv.pl.phase_portrait(adata, ['gene1', 'gene2'])
+    
+    # Plot velocity time
+    scv.pl.velocity_time(adata)</code></pre>
+        </section>
+        <section>
+            <h2>Advanced Analysis</h2>
+            <h3>Custom Velocity Models</h3>
+            <p>
+                Implementing custom velocity models for specific biological scenarios:
+            </p>
+            <pre><code>class CustomVelocityModel:
+    def __init__(self, alpha, beta, gamma):
+        self.alpha = alpha  # Transcription rate
+        self.beta = beta    # Splicing rate
+        self.gamma = gamma  # Degradation rate
+    
+    def compute_velocity(self, unspliced, spliced):
+        """Compute velocity using custom parameters"""
+        velocity = self.beta * unspliced - self.gamma * spliced
+        return velocity
+    
+    def fit_parameters(self, data):
+        """Fit model parameters to data"""
+        # Implementation of parameter fitting
+        pass</code></pre>
+            <h3>Integration with Other Methods</h3>
+            <p>
+                Combining RNA velocity with other single-cell analysis methods:
+            </p>
+            <ul>
+                <li><strong>Pseudotime Analysis:</strong> Monocle, Slingshot integration</li>
+                <li><strong>Clustering:</strong> Leiden, Louvain clustering</li>
+                <li><strong>Differential Expression:</strong> MAST, DESeq2</li>
+                <li><strong>Trajectory Analysis:</strong> PAGA, ForceAtlas2</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Applications</h2>
+            <p>
+                RNA velocity analysis has applications in:
+            </p>
+            <ul>
+                <li><strong>Developmental Biology:</strong> Understanding cell differentiation</li>
+                <li><strong>Cancer Research:</strong> Studying tumor progression</li>
+                <li><strong>Regenerative Medicine:</strong> Analyzing tissue repair</li>
+                <li><strong>Drug Discovery:</strong> Understanding drug responses</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Results and Validation</h2>
+            <p>
+                Validation of velocity predictions using:
+            </p>
+            <ul>
+                <li><strong>Time Course Data:</strong> Comparing predictions with experimental time series</li>
+                <li><strong>Lineage Tracing:</strong> Validating trajectories with genetic lineage data</li>
+                <li><strong>Perturbation Studies:</strong> Testing predictions with experimental perturbations</li>
+                <li><strong>Cross-Validation:</strong> Assessing robustness of velocity estimates</li>
+            </ul>
+            <div class="figure">
+                <em>[Validation results and performance metrics]</em>
+            </div>
+        </section>
+        <section>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li>La Manno, G., et al. (2018). <a href="https://www.nature.com/articles/s41586-018-0414-6" target="_blank">RNA velocity of single cells</a></li>
+                <li>Bergen, V., et al. (2020). <a href="https://www.nature.com/articles/s41587-020-0591-3" target="_blank">Generalizing RNA velocity to transient cell states through dynamical modeling</a></li>
+                <li>Wolf, F. A., et al. (2018). <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-017-1382-0" target="_blank">SCANPY: large-scale single-cell gene expression data analysis</a></li>
+                <li><a href="https://github.com/an308-velocity-analysis" target="_blank">Project GitHub Repository</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html> 

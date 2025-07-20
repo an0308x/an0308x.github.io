@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNETR: Transformers for 3D Medical Image Segmentation - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #444;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 1em 0;
+        }
+        .figure {
+            text-align: center;
+            margin: 2em 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .figure-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+            pre {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Home</a> |
+        <a href="/projects.html">← Projects</a>
+    </nav>
+    <header>
+        <h1>UNETR: Transformers for 3D Medical Image Segmentation</h1>
+        <p><em>Implementation of the UNETR architecture for volumetric medical image segmentation using transformer-based approaches</em></p>
+    </header>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                This project implements the UNETR (UNEt TRansformers) architecture, a novel approach that combines the power of transformers with the U-Net architecture for 3D medical image segmentation. UNETR addresses the challenges of processing volumetric medical data by leveraging self-attention mechanisms to capture long-range dependencies in 3D space.
+            </p>
+            <div class="highlight">
+                <strong>Key Features:</strong>
+                <ul>
+                    <li>3D transformer encoder for volumetric feature extraction</li>
+                    <li>U-Net decoder with skip connections for precise segmentation</li>
+                    <li>Training pipelines for medical imaging datasets</li>
+                    <li>Comprehensive evaluation metrics (Dice coefficient, Hausdorff distance)</li>
+                    <li>Visualization tools for 3D segmentation results</li>
+                </ul>
+            </div>
+        </section>
+        <section>
+            <h2>Architecture Overview</h2>
+            <p>
+                UNETR consists of three main components:
+            </p>
+            <ol>
+                <li><strong>3D Transformer Encoder:</strong> Processes input volumes using self-attention to capture global context</li>
+                <li><strong>U-Net Decoder:</strong> Reconstructs high-resolution segmentation maps with skip connections</li>
+                <li><strong>Feature Fusion:</strong> Combines transformer features with CNN features for optimal performance</li>
+            </ol>
+            <div class="figure">
+                <em>[UNETR Architecture Diagram]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Technical Implementation</h2>
+            <h3>3D Transformer Encoder</h3>
+            <p>
+                The transformer encoder processes 3D patches extracted from input volumes:
+            </p>
+            <pre><code>class Transformer3D(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_heads, num_layers):
+        super().__init__()
+        self.patch_embedding = nn.Linear(input_dim, hidden_dim)
+        self.transformer_layers = nn.ModuleList([
+            TransformerLayer(hidden_dim, num_heads) 
+            for _ in range(num_layers)
+        ])
+    
+    def forward(self, x):
+        # x: (B, C, D, H, W) -> (B, N, hidden_dim)
+        B, C, D, H, W = x.shape
+        patches = x.view(B, C, -1).transpose(1, 2)  # (B, N, C)
+        patches = self.patch_embedding(patches)
+        
+        for layer in self.transformer_layers:
+            patches = layer(patches)
+        
+        return patches</code></pre>
+            <h3>U-Net Decoder</h3>
+            <p>
+                The decoder reconstructs segmentation maps with skip connections:
+            </p>
+            <pre><code>class UNetDecoder(nn.Module):
+    def __init__(self, transformer_dim, num_classes):
+        super().__init__()
+        self.up_conv1 = nn.ConvTranspose3d(transformer_dim, 256, 2, 2)
+        self.up_conv2 = nn.ConvTranspose3d(256, 128, 2, 2)
+        self.up_conv3 = nn.ConvTranspose3d(128, 64, 2, 2)
+        self.final_conv = nn.Conv3d(64, num_classes, 1)
+    
+    def forward(self, transformer_features, skip_features):
+        x = self.up_conv1(transformer_features)
+        x = torch.cat([x, skip_features[0]], dim=1)
+        x = self.up_conv2(x)
+        x = torch.cat([x, skip_features[1]], dim=1)
+        x = self.up_conv3(x)
+        x = torch.cat([x, skip_features[2]], dim=1)
+        return self.final_conv(x)</code></pre>
+        </section>
+        <section>
+            <h2>Training Pipeline</h2>
+            <p>
+                The training process includes data augmentation, loss functions, and evaluation metrics:
+            </p>
+            <ul>
+                <li><strong>Data Augmentation:</strong> Random rotation, scaling, and intensity variations</li>
+                <li><strong>Loss Function:</strong> Combination of Dice loss and cross-entropy loss</li>
+                <li><strong>Optimization:</strong> Adam optimizer with learning rate scheduling</li>
+                <li><strong>Evaluation:</strong> Dice coefficient, Hausdorff distance, and surface distance metrics</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Results and Evaluation</h2>
+            <p>
+                The model achieves competitive performance on standard medical segmentation benchmarks:
+            </p>
+            <div class="figure">
+                <em>[Performance comparison table]</em>
+            </div>
+            <p>
+                Key advantages of UNETR include:
+            </p>
+            <ul>
+                <li>Better capture of long-range dependencies in 3D space</li>
+                <li>Improved performance on complex anatomical structures</li>
+                <li>Robust feature representation through self-attention</li>
+            </ul>
+        </section>
+        <section>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li>Hatamizadeh, A., et al. (2021). <a href="https://arxiv.org/abs/2103.10504" target="_blank">UNETR: Transformers for 3D Medical Image Segmentation</a></li>
+                <li>Ronneberger, O., Fischer, P., & Brox, T. (2015). <a href="https://arxiv.org/abs/1505.04597" target="_blank">U-Net: Convolutional Networks for Biomedical Image Segmentation</a></li>
+                <li>Vaswani, A., et al. (2017). <a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention Is All You Need</a></li>
+                <li><a href="https://github.com/an0308x/unetr-3d-medical-segmentation" target="_blank">Project GitHub Repository</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html> 

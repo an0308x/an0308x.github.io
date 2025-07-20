@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proteins's Conformational Landscape - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #444;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 1em 0;
+        }
+        .figure {
+            text-align: center;
+            margin: 2em 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .figure-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+            pre {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Home</a> |
+        <a href="/projects.html">← Projects</a>
+    </nav>
+    <header>
+        <h1>Proteins's Conformational Landscape</h1>
+        <p><em>Development of graph neural network models to predict and analyze protein-protein interactions and conformational dynamics</em></p>
+    </header>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                This project focuses on understanding and modeling the conformational landscape of proteins - the ensemble of different 3D structures that a protein can adopt. Using graph neural networks, we develop models to predict protein-protein interactions, analyze conformational changes, and understand the relationship between protein structure and function.
+            </p>
+            <div class="highlight">
+                <strong>Key Features:</strong>
+                <ul>
+                    <li>Graph neural network models for protein structure representation</li>
+                    <li>Conformational ensemble prediction and analysis</li>
+                    <li>Protein-protein interaction site prediction</li>
+                    <li>Molecular dynamics trajectory analysis</li>
+                    <li>Benchmarking on biological datasets</li>
+                </ul>
+            </div>
+        </section>
+        <section>
+            <h2>Understanding Protein Conformational Landscapes</h2>
+            <p>
+                Proteins are dynamic molecules that can adopt multiple conformations. The conformational landscape represents all possible structural states a protein can occupy, including:
+            </p>
+            <ul>
+                <li><strong>Native State:</strong> The most stable, functional conformation</li>
+                <li><strong>Intermediate States:</strong> Partially folded or transition states</li>
+                <li><strong>Misfolded States:</strong> Non-functional conformations</li>
+                <li><strong>Dynamic Fluctuations:</strong> Small-scale structural variations</li>
+            </ul>
+            <div class="figure">
+                <em>[Protein conformational landscape visualization]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Graph Neural Network Architecture</h2>
+            <h3>Protein Graph Construction</h3>
+            <p>
+                Proteins are represented as graphs where nodes represent amino acid residues and edges represent spatial or sequence relationships:
+            </p>
+            <pre><code>class ProteinGraph:
+    def __init__(self, sequence, coordinates, contacts):
+        self.sequence = sequence  # Amino acid sequence
+        self.coordinates = coordinates  # 3D coordinates
+        self.contacts = contacts  # Spatial contacts between residues
+        self.node_features = self._compute_residue_features()
+        self.edge_features = self._compute_contact_features()
+    
+    def _compute_residue_features(self):
+        # One-hot encoding of amino acids + structural features
+        features = []
+        for residue in self.sequence:
+            residue_feature = self._residue_to_feature(residue)
+            features.append(residue_feature)
+        return torch.tensor(features)
+    
+    def _compute_contact_features(self):
+        # Distance-based contact features
+        edge_features = []
+        for contact in self.contacts:
+            contact_feature = self._contact_to_feature(contact)
+            edge_features.append(contact_feature)
+        return torch.tensor(edge_features)</code></pre>
+            <h3>Conformational GNN</h3>
+            <p>
+                The GNN processes protein graphs to learn conformational representations:
+            </p>
+            <pre><code>class ConformationalGNN(nn.Module):
+    def __init__(self, node_dim, edge_dim, hidden_dim, num_layers):
+        super().__init__()
+        self.node_encoder = nn.Linear(node_dim, hidden_dim)
+        self.edge_encoder = nn.Linear(edge_dim, hidden_dim)
+        self.gnn_layers = nn.ModuleList([
+            GraphConvLayer(hidden_dim) for _ in range(num_layers)
+        ])
+        self.conformational_head = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, num_conformations)
+        )
+    
+    def forward(self, protein_graph):
+        # Encode protein graph
+        node_features = self.node_encoder(protein_graph.node_features)
+        edge_features = self.edge_encoder(protein_graph.edge_features)
+        
+        # Process through GNN layers
+        for layer in self.gnn_layers:
+            node_features = layer(node_features, protein_graph.edge_index, edge_features)
+        
+        # Predict conformational states
+        global_features = torch.mean(node_features, dim=0)
+        conformational_probs = self.conformational_head(global_features)
+        
+        return conformational_probs</code></pre>
+        </section>
+        <section>
+            <h2>Protein-Protein Interaction Prediction</h2>
+            <p>
+                The model predicts interaction sites and binding affinities between proteins:
+            </p>
+            <pre><code>class ProteinInteractionGNN(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.protein_encoder = ConformationalGNN(node_dim, edge_dim, hidden_dim, num_layers)
+        self.interaction_predictor = nn.Sequential(
+            nn.Linear(2 * hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1)  # Interaction probability
+        )
+    
+    def forward(self, protein1_graph, protein2_graph):
+        # Encode both proteins
+        protein1_features = self.protein_encoder(protein1_graph)
+        protein2_features = self.protein_encoder(protein2_graph)
+        
+        # Predict interaction
+        combined_features = torch.cat([protein1_features, protein2_features])
+        interaction_score = self.interaction_predictor(combined_features)
+        
+        return interaction_score</code></pre>
+        <section>
+            <h2>Conformational Dynamics Analysis</h2>
+            <p>
+                The model analyzes molecular dynamics trajectories to understand protein dynamics:
+            </p>
+            <ul>
+                <li><strong>Trajectory Processing:</strong> Converting MD frames to graph sequences</li>
+                <li><strong>State Classification:</strong> Identifying distinct conformational states</li>
+                <li><strong>Transition Analysis:</strong> Understanding state-to-state transitions</li>
+                <li><strong>Free Energy Estimation:</strong> Computing conformational free energies</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Applications and Results</h2>
+            <p>
+                This work has applications in:
+            </p>
+            <ul>
+                <li><strong>Drug Design:</strong> Understanding protein-ligand binding mechanisms</li>
+                <li><strong>Protein Engineering:</strong> Designing proteins with desired properties</li>
+                <li><strong>Disease Understanding:</strong> Studying protein misfolding diseases</li>
+                <li><strong>Structural Biology:</strong> Complementing experimental structure determination</li>
+            </ul>
+            <div class="figure">
+                <em>[Performance results on benchmark datasets]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Technical Challenges</h2>
+            <p>
+                Key challenges addressed in this project:
+            </p>
+            <ul>
+                <li><strong>High Dimensionality:</strong> Proteins have thousands of degrees of freedom</li>
+                <li><strong>Long Timescales:</strong> Conformational changes occur over microseconds to seconds</li>
+                <li><strong>Rare Events:</strong> Important transitions may be infrequent</li>
+                <li><strong>Computational Cost:</strong> Full atomistic simulations are expensive</li>
+            </ul>
+        </section>
+        <section>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li>Jumper, J., et al. (2021). <a href="https://www.nature.com/articles/s41586-021-03819-2" target="_blank">Highly accurate protein structure prediction with AlphaFold</a></li>
+                <li>Huang, J., et al. (2020). <a href="https://www.nature.com/articles/s41592-020-0932-7" target="_blank">CHARMM36m: an improved force field for folded and intrinsically disordered proteins</a></li>
+                <li>Kipf, T. N., & Welling, M. (2017). <a href="https://arxiv.org/abs/1609.02907" target="_blank">Semi-Supervised Classification with Graph Convolutional Networks</a></li>
+                <li><a href="https://github.com/an0308x/protein-protein-gnn" target="_blank">Project GitHub Repository</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html> 

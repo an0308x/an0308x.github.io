@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigating Ligand-Protein Docking with Graph Neural Networks - Akshay</title>
+    <style>
+        body {
+            font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #fff;
+        }
+        nav {
+            margin-bottom: 3em;
+        }
+        nav a {
+            color: #444;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #000;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #444;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 1em 0;
+        }
+        .figure {
+            text-align: center;
+            margin: 2em 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .figure-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+            }
+            pre {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Home</a> |
+        <a href="/projects.html">← Projects</a>
+    </nav>
+    <header>
+        <h1>Investigating Ligand-Protein Docking with Graph Neural Networks</h1>
+        <p><em>A comprehensive investigation into using graph neural networks for predicting ligand-protein binding poses and affinities</em></p>
+    </header>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                This project investigates the application of graph neural networks (GNNs) to the critical problem of molecular docking - predicting how small molecules (ligands) bind to protein targets. The goal is to develop accurate and efficient methods for predicting binding poses and binding affinities, which are essential for drug discovery and design.
+            </p>
+            <div class="highlight">
+                <strong>Key Features:</strong>
+                <ul>
+                    <li>Molecular graph representations for proteins and ligands</li>
+                    <li>Attention mechanisms for binding site identification</li>
+                    <li>Multi-task learning for pose and affinity prediction</li>
+                    <li>Evaluation on benchmark datasets (PDBbind, CASF)</li>
+                    <li>Visualization tools for binding predictions</li>
+                </ul>
+            </div>
+        </section>
+        <section>
+            <h2>Problem Statement</h2>
+            <p>
+                Molecular docking is a fundamental problem in computational drug discovery that involves:
+            </p>
+            <ul>
+                <li><strong>Pose Prediction:</strong> Determining the 3D orientation of a ligand within a protein binding site</li>
+                <li><strong>Affinity Prediction:</strong> Estimating the strength of binding between ligand and protein</li>
+                <li><strong>Binding Site Identification:</strong> Locating potential binding pockets on protein surfaces</li>
+            </ul>
+            <p>
+                Traditional methods rely on physics-based scoring functions and molecular dynamics simulations, which can be computationally expensive and often lack accuracy.
+            </p>
+        </section>
+        <section>
+            <h2>Graph Neural Network Approach</h2>
+            <h3>Molecular Graph Construction</h3>
+            <p>
+                Proteins and ligands are represented as graphs where nodes represent atoms and edges represent bonds or spatial relationships:
+            </p>
+            <pre><code>class MolecularGraph:
+    def __init__(self, atoms, bonds, coordinates):
+        self.atoms = atoms  # Atom types (C, N, O, etc.)
+        self.bonds = bonds  # Bond connectivity
+        self.coordinates = coordinates  # 3D coordinates
+        self.node_features = self._compute_node_features()
+        self.edge_features = self._compute_edge_features()
+    
+    def _compute_node_features(self):
+        # One-hot encoding of atom types + additional features
+        features = []
+        for atom in self.atoms:
+            atom_feature = self._atom_to_feature(atom)
+            features.append(atom_feature)
+        return torch.tensor(features)
+    
+    def _compute_edge_features(self):
+        # Bond types and distances
+        edge_features = []
+        for bond in self.bonds:
+            bond_feature = self._bond_to_feature(bond)
+            edge_features.append(bond_feature)
+        return torch.tensor(edge_features)</code></pre>
+            <h3>Graph Neural Network Architecture</h3>
+            <p>
+                The GNN processes molecular graphs through multiple message passing layers:
+            </p>
+            <pre><code>class MolecularGNN(nn.Module):
+    def __init__(self, node_dim, edge_dim, hidden_dim, num_layers):
+        super().__init__()
+        self.node_encoder = nn.Linear(node_dim, hidden_dim)
+        self.edge_encoder = nn.Linear(edge_dim, hidden_dim)
+        self.gnn_layers = nn.ModuleList([
+            GraphConvLayer(hidden_dim) for _ in range(num_layers)
+        ])
+        self.readout = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1)  # Binding affinity prediction
+        )
+    
+    def forward(self, protein_graph, ligand_graph):
+        # Encode protein and ligand graphs
+        protein_features = self.node_encoder(protein_graph.node_features)
+        ligand_features = self.node_encoder(ligand_graph.node_features)
+        
+        # Process through GNN layers
+        for layer in self.gnn_layers:
+            protein_features = layer(protein_features, protein_graph.edge_index)
+            ligand_features = layer(ligand_features, ligand_graph.edge_index)
+        
+        # Global pooling and prediction
+        protein_global = torch.mean(protein_features, dim=0)
+        ligand_global = torch.mean(ligand_features, dim=0)
+        combined = torch.cat([protein_global, ligand_global])
+        
+        return self.readout(combined)</code></pre>
+        </section>
+        <section>
+            <h2>Attention Mechanisms for Binding Sites</h2>
+            <p>
+                Attention mechanisms are used to identify and focus on important binding site regions:
+            </p>
+            <pre><code>class BindingSiteAttention(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.attention = nn.MultiheadAttention(hidden_dim, num_heads=8)
+        self.norm = nn.LayerNorm(hidden_dim)
+    
+    def forward(self, protein_features, ligand_features):
+        # Compute attention between protein and ligand
+        attended_features, attention_weights = self.attention(
+            protein_features.unsqueeze(0),
+            ligand_features.unsqueeze(0),
+            ligand_features.unsqueeze(0)
+        )
+        
+        # Identify binding site regions
+        binding_scores = attention_weights.squeeze(0).mean(dim=0)
+        return attended_features.squeeze(0), binding_scores</code></pre>
+        <section>
+            <h2>Multi-Task Learning</h2>
+            <p>
+                The model is trained to predict both binding poses and affinities simultaneously:
+            </p>
+            <ul>
+                <li><strong>Pose Prediction:</strong> 3D coordinates of ligand atoms in binding site</li>
+                <li><strong>Affinity Prediction:</strong> Binding free energy (ΔG) or pKi values</li>
+                <li><strong>Site Prediction:</strong> Probability of each protein region being a binding site</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Evaluation and Results</h2>
+            <p>
+                The model is evaluated on standard benchmarks:
+            </p>
+            <ul>
+                <li><strong>PDBbind:</strong> Large-scale protein-ligand binding database</li>
+                <li><strong>CASF:</strong> Comparative Assessment of Scoring Functions</li>
+                <li><strong>Metrics:</strong> RMSD for pose prediction, correlation coefficients for affinity prediction</li>
+            </ul>
+            <div class="figure">
+                <em>[Performance comparison with traditional methods]</em>
+            </div>
+        </section>
+        <section>
+            <h2>Applications in Drug Discovery</h2>
+            <p>
+                This work has direct applications in:
+            </p>
+            <ul>
+                <li><strong>Virtual Screening:</strong> Rapid screening of compound libraries</li>
+                <li><strong>Lead Optimization:</strong> Guiding chemical modifications</li>
+                <li><strong>Structure-Based Drug Design:</strong> Rational drug design approaches</li>
+                <li><strong>Protein Engineering:</strong> Understanding protein-ligand interactions</li>
+            </ul>
+        </section>
+        <section>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li>Stärk, H., et al. (2022). <a href="https://arxiv.org/abs/2203.06125" target="_blank">3D Infomax improves GNNs for Molecular Property Prediction</a></li>
+                <li>Liu, Z., et al. (2017). <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.7b00126" target="_blank">PDBbind-CN: Reflections and advances in the CASF benchmarks</a></li>
+                <li>Wang, R., et al. (2004). <a href="https://pubs.acs.org/doi/10.1021/jm030580l" target="_blank">The PDBbind Database: Collection of Binding Affinities for Protein-Ligand Complexes</a></li>
+                <li><a href="https://github.com/an0308x/ligand-protein-docking" target="_blank">Project GitHub Repository</a></li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html> 
